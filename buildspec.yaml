@@ -1,62 +1,23 @@
 version: 0.2
 
-#env:
-  #variables:
-     # key: "value"
-     # key: "value"
-  #parameter-store:
-     # key: "value"
-     # key: "value"
-  #secrets-manager:
-     # key: secret-id:json-key:version-stage:version-id
-     # key: secret-id:json-key:version-stage:version-id
-  #exported-variables:
-     # - variable
-     # - variable
-  #git-credential-helper: yes
-#batch:
-  #fast-fail: true
-  #build-list:
-  #build-matrix:
-  #build-graph:
 phases:
   install:
-    #If you use the Ubuntu standard image 2.0 or later, you must specify runtime-versions.
-    #If you specify runtime-versions and use an image other than Ubuntu standard image 2.0, the build fails.
-    #runtime-versions:
-      # name: version
-      # name: version
+    runtime-versions:
+      java: corretto17  # Or corretto11, depending on your project
     commands:
-       - sudo apt-get update
-       - sudo apt-get install maven -y
-       - mvn --version
-  #pre_build:
-    #commands:
-      # - command
-      # - command
+      - echo "Installing Maven..."
+      - sudo apt-get update
+      - sudo apt-get install -y maven
+      - mvn --version
   build:
     commands:
-       - mvn clean install -Dskiptests
-      # - command
+      - echo "Building the project with Maven..."
+      - mvn clean install -DskipTests
   post_build:
     commands:
-      - echo "Transfer the artifact..."
+      - echo "Uploading JAR to S3..."
       - aws s3 cp target/*.jar s3://codebuild697800486705/app.jar
-#reports:
-  #report-name-or-arn:
-    #files:
-      # - location
-      # - location
-    #base-directory: location
-    #discard-paths: yes
-    #file-format: JunitXml | CucumberJson
+
 artifacts:
   files:
-     - '**/*'
-    # - location
-  #name: $(date +%Y-%m-%d)
-  #discard-paths: yes
-  #base-directory: location
-#cache:
-  #paths:
-    # - paths
+    - target/*.jar
